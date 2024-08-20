@@ -76,6 +76,39 @@
   .form-group.invalid .form-message {
     color: #f33a58;
   }
+
+  .genders-options {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  
+  .options-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    flex-basis: 33.33%;
+  }
+  
+  .options-item input[type="radio"]:checked::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background-color: #007bff;
+    border-radius: 50%;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+  }
+  
+  .options-item span {
+    font-size: 14px;
+    color: #333;
+    user-select: none;
+  }
+  
   
   .form-message {
     font-size: 1.2rem;

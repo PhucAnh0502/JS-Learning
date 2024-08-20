@@ -41,18 +41,20 @@
 
           <div class="form-group">
             <label for="password_confirmation" class="form-label">Giới tính</label>
-            <div>
-                <input name="gender" type="radio" value="male" class="form-control">
-                Nam
+            <div class="genders-options">
+              <div class="options-item">
+                  <input name="gender" type="radio" value="male" class="form-control">
+                  <span>Nam</span>
+              </div>
+              <div class="options-item">
+                  <input name="gender" type="radio" value="female" class="form-control">
+                  <span>Nữ</span>
+              </div>
+              <div class="options-item">
+                  <input name="gender" type="radio" value="other" class="form-control">
+                  <span>Khác</span>
+              </div>              
             </div>
-            <div>
-                <input name="gender" type="radio" value="female" class="form-control">
-                Nữ
-            </div>
-            <div>
-                <input name="gender" type="radio" value="other" class="form-control">
-                Khác
-          </div>
             <span class="form-message"></span>
           </div>
       
