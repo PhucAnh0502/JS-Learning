@@ -1,2 +1,2 @@
 # JS-Learning
- Learning JavaScript
+ Learning JavaScript with mini projects
