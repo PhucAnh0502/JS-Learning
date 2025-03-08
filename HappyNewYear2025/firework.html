@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fireworks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .button-container {
+            display: none;
+            background-color: #acacac00;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .container {
+            text-align: center;
+            padding: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border: 2px solid #000000;
+            border-radius: 10px;
+            background-color: #fff;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="cas"></canvas>
+    <div class="button-container">
+        <div class="container">
+            <p id="line1"></p>
+            <p id="line2"></p>
+            <p id="line3"></p>
+            <p id="line4"></p>
+        </div>
+    </div>
+
+    <script>
+        var canvas = document.getElementById("cas");
+        var ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        var bigbooms = [];
+
+        var fireworkSound = new Audio('nmba.mp3');
+
+        function initAnimate() {
+            lastTime = new Date();
+            setTimeout(function () {
+                startTime = new Date().getTime();
+                fadeIn = true;
+            }, 3000);
+            animate();
+        }
+
+        var lastTime;
+
+        function animate() {
+            ctx.save();
+            ctx.fillStyle = "rgba(0,5,24,0.1)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+
+            var newTime = new Date();
+            if (newTime - lastTime > 1000 + (window.innerHeight - 767) / 2) {
+                var random = Math.random() * 100 > 33 ? true : false;
+                var x = getRandom(canvas.width / 5, canvas.width * 4 / 5);
+                var y = getRandom(50, 200);
+                if (random) {
+                    var bigboom = new Boom(getRandom(canvas.width / 3, canvas.width * 2 / 3), 2, "#FFF", {
+                        x: x,
+                        y: y
+                    });
+                    bigbooms.push(bigboom);
+                } else {
+                    var bigboom = new Boom(getRandom(canvas.width / 3, canvas.width * 2 / 3), 2, "#FFF", {
+                        x: canvas.width / 2,
+                        y: 200
+                    });
+                    bigbooms.push(bigboom);
+                }
+                lastTime = newTime;
+            }
+
+            for (var i = bigbooms.length - 1; i >= 0; i--) {
+                var boom = bigbooms[i];
+                if (!boom.dead) {
+                    boom._move();
+                    boom._drawLight();
+                } else {
+                    for (var j = boom.booms.length - 1; j >= 0; j--) {
+                        var frag = boom.booms[j];
+                        if (!frag.dead) {
+                            frag.moveTo();
+                        } else {
+                            boom.booms.splice(j, 1);
+                        }
+                    }
+
+                    if (boom.booms.length === 0) {
+                        bigbooms.splice(i, 1);
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        var _0x3e9aa7 = _0x23d4; (function (_0xc63cb7, _0x3c4341) { var _0x43682e = _0x23d4, _0x50298f = _0xc63cb7(); while (!![]) { try { var _0x38f10f = parseInt(_0x43682e(0x204)) / 0x1 + parseInt(_0x43682e(0x1f3)) / 0x2 + parseInt(_0x43682e(0x1ff)) / 0x3 * (parseInt(_0x43682e(0x209)) / 0x4) + parseInt(_0x43682e(0x1f1)) / 0x5 * (parseInt(_0x43682e(0x1f5)) / 0x6) + parseInt(_0x43682e(0x200)) / 0x7 * (-parseInt(_0x43682e(0x205)) / 0x8) + -parseInt(_0x43682e(0x1fa)) / 0x9 * (-parseInt(_0x43682e(0x201)) / 0xa) + parseInt(_0x43682e(0x1f2)) / 0xb * (-parseInt(_0x43682e(0x1ed)) / 0xc); if (_0x38f10f === _0x3c4341) break; else _0x50298f['push'](_0x50298f['shift']()); } catch (_0x4380fe) { _0x50298f['push'](_0x50298f['shift']()); } } }(_0x1c89, 0xd33ba)); function getRandom(_0x4d39fc, _0x53c060) { return Math['random']() * (_0x53c060 - _0x4d39fc) + _0x4d39fc; } function _0x23d4(_0x54863b, _0x1a64b9) { var _0x1c89b4 = _0x1c89(); return _0x23d4 = function (_0x23d430, _0x5e93c2) { _0x23d430 = _0x23d430 - 0x1ec; var _0xd454ee = _0x1c89b4[_0x23d430]; return _0xd454ee; }, _0x23d4(_0x54863b, _0x1a64b9); } var Boom = function (_0x5c1893, _0x1437f7, _0x1159cf, _0x51c120) { var _0x8a1557 = _0x23d4; this['booms'] = [], this['x'] = _0x5c1893, this['y'] = canvas[_0x8a1557(0x1fd)] + _0x1437f7, this['r'] = _0x1437f7, this['c'] = _0x1159cf, this['boomArea'] = _0x51c120, this[_0x8a1557(0x1ef)] = 0x0, this['dead'] = ![], this['ba'] = parseInt(getRandom(0x50, 0xc8)); }; function _0x1c89() { var _0x1dc06a = ['2445274BzoXsk', 'beginPath', '590682PpWjrk', 'moveTo', 'rgb(', 'dead', 'fill', '27qksxns', 'save', 'targetX', 'height', 'play', '3wMvsRa', '7994LErmYC', '2357470LWNbtV', 'restore', 'boomArea', '861746BQNZPx', '464poJlCV', 'fillStyle', 'targetY', '_boom', '1694944qLZCuo', 'color', 'booms', 'arc', 'rgba(255,228,150,0.3)', '8552940Lkwazs', 'push', 'theta', 'abs', '65mDKZRB', '55RupabV']; _0x1c89 = function () { return _0x1dc06a; }; return _0x1c89(); } Boom['prototype'] = { '_paint': function () { var _0x155b6e = _0x23d4; ctx[_0x155b6e(0x1fb)](), ctx['beginPath'](), ctx[_0x155b6e(0x20c)](this['x'], this['y'], this['r'], 0x0, 0x2 * Math['PI']), ctx['fillStyle'] = this['c'], ctx[_0x155b6e(0x1f9)](), ctx['restore'](); }, '_move': function () { var _0x9d2eb5 = _0x23d4, _0x707d76 = this[_0x9d2eb5(0x203)]['x'] - this['x'], _0x350184 = this[_0x9d2eb5(0x203)]['y'] - this['y']; this['x'] = this['x'] + _0x707d76 * 0.01, this['y'] = this['y'] + _0x350184 * 0.01, Math[_0x9d2eb5(0x1f0)](_0x707d76) <= this['ba'] && Math[_0x9d2eb5(0x1f0)](_0x350184) <= this['ba'] ? (this[_0x9d2eb5(0x208)](), this[_0x9d2eb5(0x1f8)] = !![]) : this['_paint'](); }, '_drawLight': function () { var _0x319e51 = _0x23d4; ctx[_0x319e51(0x1fb)](), ctx[_0x319e51(0x206)] = _0x319e51(0x1ec), ctx[_0x319e51(0x1f4)](), ctx[_0x319e51(0x20c)](this['x'], this['y'], this['r'] + 0x3 * Math['random']() + 0x1, 0x0, 0x2 * Math['PI']), ctx[_0x319e51(0x1f9)](), ctx[_0x319e51(0x202)](); }, '_boom': function () { var _0x4e5a20 = _0x23d4; fireworkSound[_0x4e5a20(0x1fe)](); var _0x374250 = getRandom(0x1e, 0xc8), _0x5af3a2 = parseInt(getRandom(0x12c, 0x190)); for (var _0x5d03ca = 0x0; _0x5d03ca < _0x374250; _0x5d03ca++) { var _0x3cf31d = { 'a': parseInt(getRandom(0x0, 0xff)), 'b': parseInt(getRandom(0x0, 0xff)), 'c': parseInt(getRandom(0x0, 0xff)) }, _0x4c3eed = getRandom(-Math['PI'], Math['PI']), _0x5c415a = getRandom(0x0, _0x5af3a2) * Math['cos'](_0x4c3eed) + this['x'], _0x122796 = getRandom(0x0, _0x5af3a2) * Math['sin'](_0x4c3eed) + this['y'], _0xb265a0 = getRandom(0x0, 0x2), _0x2a7c13 = new Frag(this['x'], this['y'], _0xb265a0, _0x3cf31d, _0x5c415a, _0x122796); this[_0x4e5a20(0x20b)][_0x4e5a20(0x1ee)](_0x2a7c13); } } }; var Frag = function (_0x3dc330, _0x54b3ea, _0x447396, _0x27c194, _0x2a7608, _0x4380ea) { var _0x354fbd = _0x23d4; this['x'] = _0x3dc330, this['y'] = _0x54b3ea, this['r'] = _0x447396, this[_0x354fbd(0x20a)] = _0x27c194, this[_0x354fbd(0x1fc)] = _0x2a7608, this[_0x354fbd(0x207)] = _0x4380ea, this[_0x354fbd(0x1f8)] = ![]; }; Frag['prototype'][_0x3e9aa7(0x1f6)] = function () { var _0x595fa0 = _0x3e9aa7; this['x'] += (this['targetX'] - this['x']) * 0.05, this['y'] += (this['targetY'] - this['y']) * 0.05, Math[_0x595fa0(0x1f0)](this[_0x595fa0(0x1fc)] - this['x']) < 0x1 && Math[_0x595fa0(0x1f0)](this[_0x595fa0(0x207)] - this['y']) < 0x1 && (this[_0x595fa0(0x1f8)] = !![]), ctx['beginPath'](), ctx[_0x595fa0(0x20c)](this['x'], this['y'], this['r'], 0x0, 0x2 * Math['PI']), ctx['fillStyle'] = _0x595fa0(0x1f7) + this[_0x595fa0(0x20a)]['a'] + ',\x20' + this['color']['b'] + ',\x20' + this[_0x595fa0(0x20a)]['c'] + ')', ctx[_0x595fa0(0x1f9)](); };
+
+        initAnimate();
+
+        window.onload = function () {
+            setTimeout(function () {
+                document.querySelector('.button-container').style.display = 'block';
+                showText();
+            }, 0);
+        };
+
+        function showText() {
+            setTimeout(function () {
+                typeText('line1', 'Chúc mừng năm mới đến với cậu và gia đình cậu, những người luôn là bến đỗ vững vàng, là nguồn động viên và là niềm vui lớn nhất trong cuộc sống của cậu!', 70, function () {
+                    setTimeout(function () {
+                        typeText('line2', 'Năm mới này, tớ chúc cậu và gia đình luôn vui vẻ, mạnh khoẻ và hạnh phúc.', 70, function () {
+                            setTimeout(function () {
+                                typeText('line3', 'Chúc cậu và gia đình một năm mới tràn ngập tiếng cười, những bữa cơm ấm áp và chúc mọi điều tốt đẹp nhất đến với cậu và gia đình cậu!', 70, function () {
+                                    setTimeout(function () {
+                                        typeText('line4', 'Chúc mừng năm mới!', 70, function () {
+                                        });
+                                    }, 500);
+                                });
+                            }, 500);
+                        });
+                    }, 500);
+                });
+            }, 1000);
+        }
+
+        function typeText(elementId, text, speed, callback) {
+            let element = document.getElementById(elementId);
+            let i = 0;
+            element.innerHTML = '';
+            let interval = setInterval(function () {
+                element.innerHTML += text.charAt(i);
+                i++;
+                if (i > text.length - 1) {
+                    clearInterval(interval);
+                    if (callback) callback();
+                }
+            }, speed);
+        }
+    </script>
+</body>
+
+</html>

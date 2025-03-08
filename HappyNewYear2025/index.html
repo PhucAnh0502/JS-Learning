@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fireworks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="cas"></canvas>
+    <script>
+        setTimeout(function () {
+            window.location.href = "firework.html";
+        }, 20000);
+
+        var canvas = document.getElementById("cas");
+        var ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        var bigbooms = [];
+
+        var fireworkSound = new Audio('fireworks.mp3');
+
+        var textOpacity = 0;
+        var fadeIn = false;
+        var fadeOut = false;
+        var startTime = null;
+        var fadeOutTime = null;
+
+        function initAnimate() {
+            lastTime = new Date();
+            setTimeout(function () {
+                startTime = new Date().getTime();
+                fadeIn = true;
+            }, 3000);
+            animate();
+        }
+        var lastTime;
+
+        function animate() {
+            ctx.save();
+            ctx.fillStyle = "rgba(0,5,24,0.1)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+
+            var newTime = new Date();
+            if (newTime - lastTime > 1000 + (window.innerHeight - 767) / 2) {
+                var random = Math.random() * 100 > 33 ? true : false;
+                var x = getRandom(canvas.width / 5, canvas.width * 4 / 5);
+                var y = getRandom(50, 200);
+                if (random) {
+                    var bigboom = new Boom(getRandom(canvas.width / 3, canvas.width * 2 / 3), 2, "#FFF", {
+                        x: x,
+                        y: y
+                    });
+                    bigbooms.push(bigboom);
+                } else {
+                    var bigboom = new Boom(getRandom(canvas.width / 3, canvas.width * 2 / 3), 2, "#FFF", {
+                        x: canvas.width / 2,
+                        y: 200
+                    });
+                    bigbooms.push(bigboom);
+                }
+                lastTime = newTime;
+            }
+
+            for (var i = bigbooms.length - 1; i >= 0; i--) {
+                var boom = bigbooms[i];
+                if (!boom.dead) {
+                    boom._move();
+                    boom._drawLight();
+                } else {
+                    for (var j = boom.booms.length - 1; j >= 0; j--) {
+                        var frag = boom.booms[j];
+                        if (!frag.dead) {
+                            frag.moveTo();
+                        } else {
+                            boom.booms.splice(j, 1);
+                        }
+                    }
+
+                    if (boom.booms.length === 0) {
+                        bigbooms.splice(i, 1);
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        function getRandom(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        var Boom = function (x, r, c, boomArea) {
+            this.booms = [];
+            this.x = x;
+            this.y = (canvas.height + r);
+            this.r = r;
+            this.c = c;
+            this.boomArea = boomArea;
+            this.theta = 0;
+            this.dead = false;
+            this.ba = parseInt(getRandom(80, 200));
+        };
+
+        Boom.prototype = {
+            _paint: function () {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+                ctx.fillStyle = this.c;
+                ctx.fill();
+                ctx.restore();
+            },
+            _move: function () {
+                var dx = this.boomArea.x - this.x,
+                    dy = this.boomArea.y - this.y;
+                this.x = this.x + dx * 0.01;
+                this.y = this.y + dy * 0.01;
+                if (Math.abs(dx) <= this.ba && Math.abs(dy) <= this.ba) {
+                    this._boom();
+                    this.dead = true;
+                } else {
+                    this._paint();
+                }
+            },
+            _drawLight: function () {
+                ctx.save();
+                ctx.fillStyle = "rgba(255,228,150,0.3)";
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r + 3 * Math.random() + 1, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.restore();
+            },
+            _boom: function () {
+                fireworkSound.play();
+
+                var fragNum = getRandom(30, 200);
+                var fanwei = parseInt(getRandom(300, 400));
+                for (var i = 0; i < fragNum; i++) {
+                    var color = {
+                        a: parseInt(getRandom(0, 255)),
+                        b: parseInt(getRandom(0, 255)),
+                        c: parseInt(getRandom(0, 255))
+                    };
+                    var a = getRandom(-Math.PI, Math.PI);
+                    var x = getRandom(0, fanwei) * Math.cos(a) + this.x;
+                    var y = getRandom(0, fanwei) * Math.sin(a) + this.y;
+                    var radius = getRandom(0, 2);
+                    var frag = new Frag(this.x, this.y, radius, color, x, y);
+                    this.booms.push(frag);
+                }
+            }
+        };
+
+        const _0x123e80 = _0x2215; (function (_0x404ed4, _0x140978) { const _0x4f9fa0 = _0x2215, _0x2d5f18 = _0x404ed4(); while (!![]) { try { const _0x1d1a93 = -parseInt(_0x4f9fa0(0x12b)) / 0x1 + -parseInt(_0x4f9fa0(0x148)) / 0x2 * (parseInt(_0x4f9fa0(0x155)) / 0x3) + -parseInt(_0x4f9fa0(0x130)) / 0x4 + -parseInt(_0x4f9fa0(0x149)) / 0x5 + -parseInt(_0x4f9fa0(0x152)) / 0x6 * (parseInt(_0x4f9fa0(0x12c)) / 0x7) + parseInt(_0x4f9fa0(0x12a)) / 0x8 + -parseInt(_0x4f9fa0(0x12d)) / 0x9 * (-parseInt(_0x4f9fa0(0x153)) / 0xa); if (_0x1d1a93 === _0x140978) break; else _0x2d5f18['push'](_0x2d5f18['shift']()); } catch (_0x2c5843) { _0x2d5f18['push'](_0x2d5f18['shift']()); } } }(_0x3064, 0xedb03)); var Frag = function (_0x37b7bb, _0x3a6c94, _0x311a22, _0x5ee2f6, _0x48d60f, _0xe902eb) { const _0xe8a1d0 = _0x2215; this['x'] = _0x37b7bb, this['y'] = _0x3a6c94, this['r'] = _0x311a22, this[_0xe8a1d0(0x13b)] = _0x5ee2f6, this['targetX'] = _0x48d60f, this['targetY'] = _0xe902eb, this[_0xe8a1d0(0x157)] = ![]; }; Frag[_0x123e80(0x159)][_0x123e80(0x13f)] = function () { const _0x1d7b1f = _0x123e80; this['x'] += (this[_0x1d7b1f(0x144)] - this['x']) * 0.05, this['y'] += (this[_0x1d7b1f(0x141)] - this['y']) * 0.05, Math[_0x1d7b1f(0x14e)](this[_0x1d7b1f(0x144)] - this['x']) < 0x1 && Math[_0x1d7b1f(0x14e)](this['targetY'] - this['y']) < 0x1 && (this[_0x1d7b1f(0x157)] = !![]), ctx[_0x1d7b1f(0x134)](), ctx['arc'](this['x'], this['y'], this['r'], 0x0, 0x2 * Math['PI']), ctx['fillStyle'] = 'rgb(' + this['color']['a'] + ',\x20' + this['color']['b'] + ',\x20' + this['color']['c'] + ')', ctx['fill'](); }, initAnimate(), canvas['onclick'] = function (_0x5aa6ef) { const _0x3f8f78 = _0x123e80; var _0x489080 = _0x5aa6ef[_0x3f8f78(0x158)], _0x4afcdd = _0x5aa6ef[_0x3f8f78(0x12e)], _0x338229 = new Boom(getRandom(canvas[_0x3f8f78(0x12f)] / 0x3, canvas[_0x3f8f78(0x12f)] * 0x2 / 0x3), 0x2, _0x3f8f78(0x14f), { 'x': _0x489080, 'y': _0x4afcdd }); bigbooms[_0x3f8f78(0x14a)](_0x338229); }; let chars, particles, current, duration = 0x1388, str = [_0x123e80(0x160), 'New', _0x123e80(0x150), _0x123e80(0x15c)]; init(), resize(), requestAnimationFrame(render), addEventListener(_0x123e80(0x132), resize); function makeChar(_0x478b16) { const _0x5055a9 = _0x123e80; let _0x41ba54 = document[_0x5055a9(0x151)](_0x5055a9(0x14d)), _0x4ec548 = _0x41ba54[_0x5055a9(0x12f)] = _0x41ba54[_0x5055a9(0x14c)] = w < 0x190 ? 0xc8 : 0x12c, _0x8a1482 = _0x41ba54[_0x5055a9(0x138)]('2d'); _0x8a1482[_0x5055a9(0x164)] = 'bold\x20' + _0x4ec548 + _0x5055a9(0x135), _0x8a1482[_0x5055a9(0x146)] = _0x5055a9(0x133), _0x8a1482[_0x5055a9(0x15d)] = _0x5055a9(0x131), _0x8a1482['textAlign'] = 'center', _0x8a1482[_0x5055a9(0x142)](_0x478b16, _0x4ec548 / 0x2, _0x4ec548 / 0x2); let _0x4dff69 = _0x8a1482['getImageData'](0x0, 0x0, _0x4ec548, _0x4ec548), _0x59752a = []; for (var _0x1ca002 = 0x0; _0x59752a[_0x5055a9(0x136)] < particles; _0x1ca002++) { let _0x4afaff = _0x4ec548 * Math[_0x5055a9(0x140)](), _0x12359c = _0x4ec548 * Math[_0x5055a9(0x140)](), _0x52e561 = parseInt(_0x12359c) * _0x4ec548 * 0x4 + parseInt(_0x4afaff) * 0x4; if (_0x4dff69[_0x5055a9(0x13d)][_0x52e561]) _0x59752a[_0x5055a9(0x14a)]([_0x4afaff - _0x4ec548 / 0x2, _0x12359c - _0x4ec548 / 0x2]); } return _0x59752a; } function init() { const _0x1c800d = _0x123e80; canvas = document[_0x1c800d(0x151)](_0x1c800d(0x14d)), document[_0x1c800d(0x161)][_0x1c800d(0x15f)](canvas), document[_0x1c800d(0x161)][_0x1c800d(0x162)]['margin'] = 0x0, document[_0x1c800d(0x161)]['style'][_0x1c800d(0x143)] = _0x1c800d(0x14b), document[_0x1c800d(0x161)][_0x1c800d(0x162)][_0x1c800d(0x163)] = _0x1c800d(0x139), ctx = canvas[_0x1c800d(0x138)]('2d'); } function resize() { const _0x12f7ea = _0x123e80; w = canvas['width'] = innerWidth, h = canvas[_0x12f7ea(0x14c)] = innerHeight, particles = innerWidth < 0x190 ? 0x37 : 0x63; } function makeChars(_0x5dace2) { const _0x81dc49 = _0x123e80; let _0x358167 = parseInt(_0x5dace2 / duration) % str[_0x81dc49(0x136)]; if (current === _0x358167) return; current = _0x358167, chars = [...str[_0x358167]]['map'](makeChar); } function render(_0xf94034) { const _0x3ff763 = _0x123e80; makeChars(_0xf94034), requestAnimationFrame(render), ctx[_0x3ff763(0x146)] = _0x3ff763(0x15b), ctx[_0x3ff763(0x13a)](0x0, 0x0, w, h), chars[_0x3ff763(0x15e)]((_0x4567a5, _0x31f0d6) => firework(_0xf94034, _0x31f0d6, _0x4567a5)); } function _0x3064() { const _0x3e89de = ['hsl(', '1983PelCVc', 'min', 'dead', 'clientX', 'prototype', ',\x2055%,\x20', '#00000010', '2025', 'textBaseline', 'forEach', 'append', 'Happy', 'body', 'style', 'background', 'font', '2378120Bdvgah', '560846AoHtIT', '7xUdraH', '720oOOyDq', 'clientY', 'width', '2378688CajrPv', 'middle', 'resize', 'white', 'beginPath', 'px\x20Arial', 'length', 'fill', 'getContext', 'black', 'fillRect', 'color', 'pow', 'data', 'max', 'moveTo', 'random', 'targetY', 'fillText', 'overflow', 'targetX', 'ellipse', 'fillStyle', 'sin', '3706OSNPuT', '840670oyWEhT', 'push', 'hidden', 'height', 'canvas', 'abs', '#FFF', 'Year', 'createElement', '3906294hoLtzk', '484480nPbBRd']; _0x3064 = function () { return _0x3e89de; }; return _0x3064(); } function firework(_0x4b444e, _0x1ddd49, _0x485ade) { const _0x1788e1 = _0x123e80; _0x4b444e -= _0x1ddd49 * 0xc8; let _0x5b4adc = _0x1ddd49 + chars[_0x1788e1(0x136)] * parseInt(_0x4b444e - _0x4b444e % duration); _0x4b444e = _0x4b444e % duration / duration; let _0x298a3a = (_0x1ddd49 + 0x1) * w / (0x1 + chars['length']); _0x298a3a += Math[_0x1788e1(0x156)](0.33, _0x4b444e) * 0x64 * Math[_0x1788e1(0x147)](_0x5b4adc); let _0x434c3c = h * 0.5; _0x434c3c += Math[_0x1788e1(0x147)](_0x5b4adc * 4547.411) * h * 0.1, _0x4b444e < 0.33 ? rocket(_0x298a3a, _0x434c3c, _0x5b4adc, _0x4b444e * 0x3) : explosion(_0x485ade, _0x298a3a, _0x434c3c, _0x5b4adc, Math[_0x1788e1(0x156)](0x1, Math[_0x1788e1(0x13e)](0x0, _0x4b444e - 0.33) * 0x2)); } function rocket(_0x29c613, _0x158c26, _0x462be1, _0x3c1b69) { const _0x569587 = _0x123e80; ctx[_0x569587(0x146)] = _0x569587(0x133); let _0x3d184a = 0x2 - 0x2 * _0x3c1b69 + Math[_0x569587(0x13c)](_0x3c1b69, 0xf * _0x3c1b69) * 0x10; _0x158c26 = h - _0x158c26 * _0x3c1b69, circle(_0x29c613, _0x158c26, _0x3d184a); } function _0x2215(_0x2fe50e, _0x599e90) { const _0x306403 = _0x3064(); return _0x2215 = function (_0x2215d3, _0x1c0576) { _0x2215d3 = _0x2215d3 - 0x12a; let _0x26a6e3 = _0x306403[_0x2215d3]; return _0x26a6e3; }, _0x2215(_0x2fe50e, _0x599e90); } function explosion(_0x50d895, _0x471382, _0x14d4e7, _0x365851, _0x587faa) { const _0x164472 = _0x123e80; let _0x341ee0 = _0x587faa * _0x587faa * _0x587faa * 0x14, _0x1cbc23 = Math[_0x164472(0x147)](_0x365851) * 0x1 + 0x3; _0x1cbc23 = _0x587faa < 0.5 ? (_0x587faa + 0.5) * _0x587faa * _0x1cbc23 : _0x1cbc23 - _0x587faa * _0x1cbc23, ctx['fillStyle'] = _0x164472(0x154) + _0x365851 * 0x37 + ',\x2055%,\x2055%)', _0x50d895['forEach']((_0x59e1c5, _0x470b44) => { const _0xc2ffbb = _0x164472; if (_0x470b44 % 0x14 === 0x0) ctx['fillStyle'] = _0xc2ffbb(0x154) + _0x365851 * 0x37 + _0xc2ffbb(0x15a) + (0x37 + _0x587faa * Math['sin'](_0x587faa * 0x37 + _0x470b44) * 0x2d) + '%)'; circle(_0x587faa * _0x59e1c5[0x0] + _0x471382, h - _0x14d4e7 + _0x587faa * _0x59e1c5[0x1] + _0x341ee0, _0x1cbc23); }); } function circle(_0x1040ea, _0x21cea0, _0x3b564a) { const _0x92a46a = _0x123e80; ctx[_0x92a46a(0x134)](), ctx[_0x92a46a(0x145)](_0x1040ea, _0x21cea0, _0x3b564a, _0x3b564a, 0x0, 0x0, Math['PI'] * 0x2), ctx[_0x92a46a(0x137)](); }
+
+    </script>
+</body>
+
+</html>
